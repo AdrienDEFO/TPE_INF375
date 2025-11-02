@@ -699,6 +699,8 @@ def methode_crout(matrice: np.ndarray, vecteur: np.ndarray, verbose: bool = Fals
         
         # Calcul des éléments de L (colonne i)
         for j in range(i, n):
+            if U[i, i]==0:
+                raise ErreurNumerique("les U[i,i] doivent être non null")
             if i == j:
                 L[i, i] = 1.0  # Diagonale de L = 1
             else:
@@ -719,67 +721,7 @@ def methode_crout(matrice: np.ndarray, vecteur: np.ndarray, verbose: bool = Fals
         X[i] = (Y[i] - sum(U[i, j] * X[j] for j in range(i+1, n))) / U[i, i]
     
     if verbose:
-        logging.info("Système résolu avec succès par décomposition LU")
+        logging.info("Système résolu par décomposition LU")
         logging.info(f"Solution: {X}")
     
-    return X
-def newton_cote(fonction: str, borne_inf: float, borne_sup: float, degre: int, verbose: bool = False) -> float:
-    """
-    
-    Args:
-        fonction: Expression mathématique de la fonction à intégrer
-        borne_inf: Borne inférieure d'intégration
-        borne_sup: Borne supérieure d'intégration
-        degre: Degré de la méthode (nombre de points - 1)
-        verbose: Si True, affiche les détails des calculs
-    
-    Returns:
-        float: Approximation de l'intégrale
-    """
-    if verbose:
-        logging.info(f"Début méthode Newton-Côte: ∫[{borne_inf},{borne_sup}] {fonction} dx, degré={degre}")
-    
-    def f(x: float) -> float:
-        try:
-            return eval(fonction)
-        except Exception as e:
-            raise ErreurNumerique(f"Erreur lors de l'évaluation de f({x}): {e}")
-    
-    # Validation des paramètres
-    if borne_inf >= borne_sup:
-        raise ErreurNumerique("La borne inférieure doit être strictement inférieure à la borne supérieure")
-    
-    if degre < 2:
-        raise ErreurNumerique("Le degré doit être au moins 2")
-    
-    # Points d'intégration équidistants
-    points_x = np.linspace(borne_inf, borne_sup, degre)
-    points_y = [f(x) for x in points_x]
-    
-    # Calcul des coefficients de Newton-Côte
-    h = (borne_sup - borne_inf) / (degre - 1)
-    integrale = 0.0
-    
-    # Méthode des trapèzes (degre=2)
-    if degre == 2:
-        integrale = (borne_sup - borne_inf) * (f(borne_inf) + f(borne_sup)) / 2
-    
-    # Méthode de Simpson (degre=3)  
-    elif degre == 3:
-        milieu = (borne_inf + borne_sup) / 2
-        integrale = (borne_sup - borne_inf) * (f(borne_inf) + 4*f(milieu) + f(borne_sup)) / 6
-    
-    # Méthode générale pour les degrés supérieurs
-    else:
-        # Construction du système pour les coefficients
-        matrice_vandermonde = np.vander(points_x, increasing=True)[:, :degre]
-        seconds_membres = [(borne_sup**(k+1) - borne_inf**(k+1)) / (k+1) for k in range(degre)]
-        
-        # Résolution du système linéaire
-        coefficients = np.linalg.solve(matrice_vandermonde.T, seconds_membres)
-        integrale = np.dot(coefficients, points_y)
-    
-    if verbose:
-        logging.info(f"Intégrale approximative: {integrale}")
-    
-    return integrale
+    return L,U,X

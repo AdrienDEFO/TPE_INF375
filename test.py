@@ -10,6 +10,7 @@ from numerical import (
     balayage, dichotomie, lagrange, newton_raphson, newton_cote,
     pivot_gauss, gauss_jordan, methode_crout
 )""" 
+# pour masquer le detail de la compilation, remplacer la valeur de verbose par false
 def main():
     """Fonction principale """
     
@@ -31,7 +32,7 @@ def main():
         f1 = input("Entrez la fonction f(x) exemple: (x**2 - 2*x + 1)\n")
         a = float(input("Entrez la borne inférieure: "))
         b = float(input("Entrez la borne supérieure: "))
-        pas = float(input("Entrez le pas de balayage: "))
+        pas = float(input("Entrez le pas de balayage(le seuil): "))
         # L'utilisateur entre le maximum d'itérations (valeur par défaut: 10000)
         max_iter_input = input("Entrez le maximum d'itérations (défaut: 10000): ")
         max_iterations = int(max_iter_input) if max_iter_input.strip() != "" else 10000
